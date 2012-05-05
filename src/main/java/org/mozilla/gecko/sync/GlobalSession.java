@@ -914,23 +914,19 @@ public class GlobalSession implements CredentialsSource, PrefsSource, HttpRespon
    * @throws MetaGlobalException
    */
   public boolean engineIsEnabled(String engineName, EngineSettings engineSettings) throws MetaGlobalException {
+    if (this.config.metaGlobal == null) {
+      throw new MetaGlobalNotSetException();
+    }
+
     // This should not occur.
     if (this.config.enabledEngineNames == null) {
       Logger.error(LOG_TAG, "No enabled engines in config. Giving up.");
-      if (this.config.metaGlobal == null) {
-        throw new MetaGlobalNotSetException();
-      }
       throw new MetaGlobalMissingEnginesException();
     }
 
     if (!(this.config.enabledEngineNames.contains(engineName))) {
       Logger.debug(LOG_TAG, "Engine " + engineName + " not enabled: no meta/global entry.");
       return false;
-    }
-
-    if (this.config.metaGlobal == null) {
-      Logger.warn(LOG_TAG, "No meta/global; using historical enabled engine names.");
-      return true;
     }
 
     // If we have a meta/global, check that it's safe for us to sync.
